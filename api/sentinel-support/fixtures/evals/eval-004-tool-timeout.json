@@ -1,0 +1,41 @@
+{
+  "id": "eval-004",
+  "name": "Risk Tool Timeout Fallback",
+  "description": "Test fallback behavior when risk assessment tool times out",
+  "scenario": "tool_timeout",
+  "input": {
+    "alertId": "alert-002",
+    "customerId": "d2f8f9b1-5c4g-5d9c-b2f3-g5e6f7890123",
+    "simulatedFailures": {
+      "riskSignals": {
+        "timeout": true,
+        "duration": 1500
+      }
+    }
+  },
+  "expectedOutcome": {
+    "fallbackUsed": true,
+    "riskLevel": "MEDIUM",
+    "reasons": ["risk_unavailable", "duplicate_charge"],
+    "recommendation": "Manual review recommended",
+    "toolStatus": {
+      "getProfile": "success",
+      "recentTx": "success", 
+      "riskSignals": "timeout",
+      "kbLookup": "success",
+      "decide": "success"
+    },
+    "sseEvents": [
+      "plan_built",
+      "tool_update",
+      "fallback_triggered", 
+      "decision_finalized"
+    ]
+  },
+  "validation": {
+    "fallbackTriggered": true,
+    "traceLogged": true,
+    "latencyWithinBounds": true,
+    "circuitBreakerNotTriggered": true
+  }
+}

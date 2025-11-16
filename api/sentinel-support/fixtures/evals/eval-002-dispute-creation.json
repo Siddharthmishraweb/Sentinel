@@ -1,0 +1,39 @@
+{
+  "id": "eval-002", 
+  "name": "Dispute Creation Flow",
+  "description": "Test dispute creation for unrecognized transaction",
+  "scenario": "dispute_creation",
+  "input": {
+    "customerId": "f4h0h1d3-7e6i-7f1e-d4h5-i7g8h9012345",
+    "transactionId": "txn-suspicious-001",
+    "customerReport": "Unrecognized ₹4,999 charge at ABC Mart yesterday",
+    "merchant": "ABC Mart",
+    "amount": 499900,
+    "currency": "INR", 
+    "timestamp": "2024-11-14T23:45:00Z"
+  },
+  "expectedOutcome": {
+    "disputeCreated": true,
+    "reasonCode": "10.4",
+    "caseType": "DISPUTE",
+    "status": "OPEN",
+    "recommendations": [
+      "File dispute with reason code 10.4 (Unrecognized transaction)",
+      "Contact customer for additional verification",
+      "Monitor merchant response"
+    ],
+    "kbCitations": [
+      {
+        "docId": "kb-001",
+        "title": "Dispute Process Overview",
+        "anchor": "dispute-overview"
+      }
+    ]
+  },
+  "validation": {
+    "caseCreated": true,
+    "timelineUpdated": true,
+    "customerNotified": true,
+    "auditTrail": true
+  }
+}

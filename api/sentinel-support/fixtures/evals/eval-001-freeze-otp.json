@@ -1,0 +1,36 @@
+{
+  "id": "eval-001",
+  "name": "Freeze Card with OTP Flow",
+  "description": "Test card freeze operation requiring OTP verification",
+  "scenario": "freeze_otp",
+  "input": {
+    "alertId": "alert-001",
+    "cardId": "card-004",
+    "customerId": "f4h0h1d3-7e6i-7f1e-d4h5-i7g8h9012345",
+    "riskScore": 85,
+    "suspiciousTransaction": {
+      "merchant": "ABC Mart",
+      "amount": "$4,999",
+      "location": "Mumbai, India",
+      "timestamp": "2024-11-14T23:45:00Z"
+    }
+  },
+  "expectedOutcome": {
+    "recommendation": "Freeze Card",
+    "otpRequired": true,
+    "riskLevel": "HIGH",
+    "reasons": ["unusual_merchant", "foreign_transaction", "large_amount"],
+    "actions": [
+      {
+        "type": "freeze_card",
+        "status": "PENDING_OTP"
+      }
+    ]
+  },
+  "validation": {
+    "traceSteps": ["getProfile", "recentTx", "riskSignals", "kbLookup", "decide", "proposeAction"],
+    "metricsIncrement": ["action_blocked_total{policy=otp_required}"],
+    "auditLogRequired": true,
+    "otpCode": "123456"
+  }
+}

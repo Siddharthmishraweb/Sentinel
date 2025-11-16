@@ -1,0 +1,42 @@
+[
+  {
+    "id": "policy-001",
+    "code": "FREEZE_OTP_REQ",
+    "title": "Card Freeze OTP Requirement",
+    "contentText": "All card freeze operations must include OTP verification unless classified as emergency security event with risk score >= 90.",
+    "active": true,
+    "priority": 100
+  },
+  {
+    "id": "policy-002",
+    "code": "DISPUTE_AMOUNT_LIMIT", 
+    "title": "Dispute Amount Authorization",
+    "contentText": "Disputes over $5000 require lead agent approval. Disputes over $25000 require manager approval and additional documentation.",
+    "active": true,
+    "priority": 90
+  },
+  {
+    "id": "policy-003",
+    "code": "PII_REDACTION",
+    "title": "PII Data Redaction Requirements",
+    "contentText": "All card numbers (13-19 digits), SSNs, and account numbers must be redacted in logs, traces, and UI displays. Use ****REDACTED**** format.",
+    "active": true,
+    "priority": 200
+  },
+  {
+    "id": "policy-004",
+    "code": "RATE_LIMIT_ENFORCEMENT",
+    "title": "API Rate Limiting Policy", 
+    "contentText": "Enforce 5 requests per second per client with token bucket algorithm. Return 429 with Retry-After header when exceeded.",
+    "active": true,
+    "priority": 150
+  },
+  {
+    "id": "policy-005",
+    "code": "AUDIT_TRAIL_REQ",
+    "title": "Audit Trail Requirements",
+    "contentText": "All case actions must be logged with actor, timestamp, action type, and payload. Maintain 7 year retention for compliance.",
+    "active": true,
+    "priority": 180
+  }
+]

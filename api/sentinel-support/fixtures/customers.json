@@ -1,0 +1,57 @@
+[
+  {
+    "id": "c1e7e8a0-4b3f-4c8b-a1e2-f4d5e6789012",
+    "name": "Alice Johnson",
+    "emailMasked": "alice.j****@example.com",
+    "kycLevel": "ENHANCED",
+    "metadata": {
+      "signupDate": "2023-01-15",
+      "preferredLanguage": "en",
+      "riskProfile": "low"
+    }
+  },
+  {
+    "id": "d2f8f9b1-5c4g-5d9c-b2f3-g5e6f7890123",
+    "name": "Bob Smith",
+    "emailMasked": "bob.s****@example.com",
+    "kycLevel": "BASIC",
+    "metadata": {
+      "signupDate": "2023-02-20",
+      "preferredLanguage": "en",
+      "riskProfile": "medium"
+    }
+  },
+  {
+    "id": "e3g9g0c2-6d5h-6e0d-c3g4-h6f7g8901234",
+    "name": "Carol Davis",
+    "emailMasked": "carol.d****@example.com", 
+    "kycLevel": "PREMIUM",
+    "metadata": {
+      "signupDate": "2022-11-10",
+      "preferredLanguage": "en",
+      "riskProfile": "low"
+    }
+  },
+  {
+    "id": "f4h0h1d3-7e6i-7f1e-d4h5-i7g8h9012345",
+    "name": "David Wilson",
+    "emailMasked": "david.w****@example.com",
+    "kycLevel": "BASIC",
+    "metadata": {
+      "signupDate": "2023-03-05",
+      "preferredLanguage": "en",
+      "riskProfile": "high"
+    }
+  },
+  {
+    "id": "g5i1i2e4-8f7j-8g2f-e5i6-j8h9i0123456",
+    "name": "Emma Brown",
+    "emailMasked": "emma.b****@example.com",
+    "kycLevel": "ENHANCED",
+    "metadata": {
+      "signupDate": "2023-01-25",
+      "preferredLanguage": "en",
+      "riskProfile": "medium"
+    }
+  }
+]

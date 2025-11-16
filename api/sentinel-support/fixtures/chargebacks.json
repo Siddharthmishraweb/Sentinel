@@ -1,0 +1,116 @@
+[
+  {
+    "id": "cb_001",
+    "transaction_id": "txn_001",
+    "customer_id": "cust_001", 
+    "amount_cents": 250000,
+    "currency": "USD",
+    "reason_code": "10.4",
+    "reason_description": "Fraudulent Transaction",
+    "chargeback_date": "2024-01-15T08:30:00Z",
+    "due_date": "2024-01-22T23:59:59Z",
+    "status": "OPEN",
+    "representment_eligible": true,
+    "liability_shift": true,
+    "merchant_name": "TechCorp Solutions",
+    "card_network": "VISA",
+    "metadata": {
+      "arn": "74537604221234567890",
+      "acquirer_ref": "ACQ123456789",
+      "processor_ref": "PROC987654321"
+    }
+  },
+  {
+    "id": "cb_002", 
+    "transaction_id": "txn_045",
+    "customer_id": "cust_003",
+    "amount_cents": 89999,
+    "currency": "USD",
+    "reason_code": "13.1",
+    "reason_description": "Merchandise/Services Not Received",
+    "chargeback_date": "2024-01-12T14:45:00Z",
+    "due_date": "2024-01-19T23:59:59Z", 
+    "status": "REPRESENTED",
+    "representment_eligible": false,
+    "liability_shift": false,
+    "merchant_name": "QuickShop Online",
+    "card_network": "MASTERCARD",
+    "representment_date": "2024-01-16T10:20:00Z",
+    "metadata": {
+      "arn": "74537604221234567891", 
+      "acquirer_ref": "ACQ123456790",
+      "processor_ref": "PROC987654322",
+      "representment_evidence": ["receipt", "shipping_confirmation", "delivery_proof"]
+    }
+  },
+  {
+    "id": "cb_003",
+    "transaction_id": "txn_078",
+    "customer_id": "cust_002", 
+    "amount_cents": 1250000,
+    "currency": "USD",
+    "reason_code": "4855",
+    "reason_description": "Non-Receipt of Merchandise",
+    "chargeback_date": "2024-01-10T09:15:00Z",
+    "due_date": "2024-01-17T23:59:59Z",
+    "status": "LOST",
+    "representment_eligible": false,
+    "liability_shift": true,
+    "merchant_name": "Premium Electronics",
+    "card_network": "VISA",
+    "final_liability_date": "2024-01-18T00:00:00Z",
+    "metadata": {
+      "arn": "74537604221234567892",
+      "acquirer_ref": "ACQ123456791", 
+      "processor_ref": "PROC987654323",
+      "loss_reason": "insufficient_evidence"
+    }
+  },
+  {
+    "id": "cb_004",
+    "transaction_id": "txn_156",
+    "customer_id": "cust_005",
+    "amount_cents": 45000,
+    "currency": "USD", 
+    "reason_code": "4837",
+    "reason_description": "No Cardholder Authorization",
+    "chargeback_date": "2024-01-08T16:20:00Z",
+    "due_date": "2024-01-15T23:59:59Z",
+    "status": "WON",
+    "representment_eligible": true,
+    "liability_shift": false,
+    "merchant_name": "Local Coffee Shop",
+    "card_network": "VISA", 
+    "representment_date": "2024-01-12T11:30:00Z",
+    "resolution_date": "2024-01-14T15:45:00Z",
+    "metadata": {
+      "arn": "74537604221234567893",
+      "acquirer_ref": "ACQ123456792",
+      "processor_ref": "PROC987654324", 
+      "win_reason": "valid_authorization_provided"
+    }
+  },
+  {
+    "id": "cb_005",
+    "transaction_id": "txn_203",
+    "customer_id": "cust_004",
+    "amount_cents": 199900,
+    "currency": "USD",
+    "reason_code": "13.2", 
+    "reason_description": "Cancelled Recurring Transaction",
+    "chargeback_date": "2024-01-05T11:10:00Z",
+    "due_date": "2024-01-12T23:59:59Z",
+    "status": "EXPIRED", 
+    "representment_eligible": false,
+    "liability_shift": true,
+    "merchant_name": "StreamFlix Subscription",
+    "card_network": "MASTERCARD",
+    "expiry_date": "2024-01-13T00:00:00Z",
+    "metadata": {
+      "arn": "74537604221234567894",
+      "acquirer_ref": "ACQ123456793",
+      "processor_ref": "PROC987654325",
+      "expiry_reason": "no_response_submitted"
+    }
+  }
+]

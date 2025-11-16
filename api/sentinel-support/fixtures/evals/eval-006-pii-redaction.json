@@ -1,0 +1,40 @@
+{
+  "id": "eval-006",
+  "name": "PII Redaction Validation",
+  "description": "Test PII data redaction in UI, logs, and traces", 
+  "scenario": "pii_redaction",
+  "input": {
+    "userInput": "Customer says their card 4111111111111111 was charged $500",
+    "transactionData": {
+      "cardNumber": "4532123456789012",
+      "customerEmail": "alice.johnson@example.com",
+      "ssn": "123-45-6789"
+    },
+    "logMessages": [
+      "Processing transaction for card 4532123456789012",
+      "Customer alice.johnson@example.com reported fraud"
+    ]
+  },
+  "expectedOutcome": {
+    "uiDisplay": "Customer says their card ****REDACTED**** was charged $500",
+    "logEntries": [
+      "Processing transaction for card ****REDACTED****",
+      "Customer ****REDACTED**** reported fraud"
+    ],
+    "structuredLogs": {
+      "masked": true,
+      "originalDataRedacted": true
+    },
+    "traceData": {
+      "cardNumberRedacted": true,
+      "emailRedacted": true,
+      "ssnRedacted": true
+    }
+  },
+  "validation": {
+    "noPlaintextPII": true,
+    "redactionMarkerPresent": true,
+    "maskedFieldLogged": true,
+    "auditTrailClean": true
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "eval-007",
+  "name": "Performance Benchmark",
+  "description": "Test query performance with 1M+ transactions",
+  "scenario": "performance_test",
+  "input": {
+    "customerId": "c1e7e8a0-4b3f-4c8b-a1e2-f4d5e6789012",
+    "dateRange": "last_90_days",
+    "expectedTransactions": 50000,
+    "queryType": "customer_transactions"
+  },
+  "expectedOutcome": {
+    "responseTime": "< 100ms",
+    "percentile95": "< 150ms", 
+    "queryPlan": "index_scan",
+    "rowsExamined": "< 100000"
+  },
+  "validation": {
+    "performanceWithinSLA": true,
+    "indexUsed": true,
+    "memoryUsageAcceptable": true,
+    "paginationWorking": true
+  }
+}

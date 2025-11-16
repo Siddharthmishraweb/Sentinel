@@ -1,0 +1,251 @@
+{
+  "info": {
+    "name": "Sentinel Support API Collection",
+    "description": "Comprehensive Postman collection for Sentinel Support platform.\n\nEnvironment Variables:\n- {{base_url}}: Base API URL (e.g. http://localhost:3002)\n- {{api_key}}: API key if required by protected endpoints\n\nConventions:\n- All timestamps are ISO8601 unless noted\n- Pagination uses either page+limit or cursor depending on endpoint\n- Errors follow { error: string, message?: string, timestamp?: string } shape\n\nAuthentication:\nCurrently endpoints shown do not enforce auth in code, but production should use headers:\n- Authorization: Bearer <token>\n- X-Request-ID: Unique id for tracing\n\nFolders group functional areas. Each request documents parameters, sample success, and error responses.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": { "major": 1, "minor": 0, "patch": 0 }
+  },
+  "item": [
+    {
+      "name": "Alerts",
+      "description": "Alert lifecycle endpoints: list, retrieve, assign, resolve.",
+      "item": [
+        {
+          "name": "List Alerts",
+          "request": {
+            "method": "GET",
+            "header": [ {"key": "X-Request-ID", "value": "{{uuid}}"} ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/alerts?limit=10&priority=HIGH&status=OPEN",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","alerts"],
+              "query": [
+                {"key": "limit", "value": "10", "description": "Max alerts to return (default 10)"},
+                {"key": "priority", "value": "HIGH", "description": "Filter by priority (LOW|MEDIUM|HIGH|CRITICAL)"},
+                {"key": "status", "value": "OPEN", "description": "Filter by status"},
+                {"key": "cursor", "value": "", "description": "Pagination cursor (created_at of last item)"},
+                {"key": "customer_id", "value": "", "description": "Filter by customer id"}
+              ]
+            },
+            "description": "Retrieves paginated alerts. Use cursor-based pagination.\n\nSuccess 200: { data: Alert[], pagination: { next_cursor, has_next } }\nError 500: { error, message }"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"alert_123\",\n      \"title\": \"Suspicious Transaction\",\n      \"description\": \"High value overseas transaction\",\n      \"priority\": \"HIGH\",\n      \"status\": \"OPEN\",\n      \"type\": \"FRAUD\",\n      \"customer_id\": \"cust_789\",\n      \"assigned_agent\": null,\n      \"created_at\": \"2025-11-15T10:00:00Z\",\n      \"updated_at\": \"2025-11-15T10:00:00Z\",\n      \"customer_name\": \"Jane Smith\"\n    }\n  ],\n  \"pagination\": {\n    \"next_cursor\": \"2025-11-15T09:55:00Z\",\n    \"has_next\": true\n  }\n}"
+            },
+            {
+              "name": "500 Server Error",
+              "status": "Internal Server Error",
+              "code": 500,
+              "body": "{ \"error\": \"Failed to fetch alerts\", \"message\": \"Database unavailable\" }"
+            }
+          ]
+        },
+        {
+          "name": "Get Alert",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/alerts/alert_123",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","alerts","alert_123"]
+            },
+            "description": "Retrieve a single alert by id.\n\n404 if not found."
+          },
+          "response": [
+            {"name": "200 OK", "code": 200, "body": "{ \"id\": \"alert_123\", \"title\": \"Suspicious Transaction\" }"},
+            {"name": "404 Not Found", "code": 404, "body": "{ \"error\": \"Alert not found\" }"}
+          ]
+        },
+        {
+          "name": "Assign Alert",
+          "request": {
+            "method": "POST",
+            "header": [ {"key": "Content-Type", "value": "application/json"} ],
+            "body": {"mode": "raw", "raw": "{ \n  \"agent\": \"agent.alex\"\n}"},
+            "url": {"raw": "{{base_url}}/api/v1/alerts/alert_123/assign","host":["{{base_url}}"],"path":["api","v1","alerts","alert_123","assign"]},
+            "description": "Assign alert to agent.\n\n400 if agent missing; 404 if alert missing."
+          },
+          "response": [
+            {"name": "200 OK", "code": 200, "body": "{ \"id\": \"alert_123\", \"assigned_agent\": \"agent.alex\", \"status\": \"assigned\" }"},
+            {"name": "400 Bad Request", "code": 400, "body": "{ \"error\": \"Agent name is required\" }"},
+            {"name": "404 Not Found", "code": 404, "body": "{ \"error\": \"Alert not found\" }"}
+          ]
+        },
+        {
+          "name": "Resolve Alert",
+          "request": {
+            "method": "POST",
+            "header": [ {"key": "Content-Type", "value": "application/json"} ],
+            "body": {"mode": "raw", "raw": "{\n  \"resolution_notes\": \"Customer confirmed transaction\"\n}"},
+            "url": {"raw": "{{base_url}}/api/v1/alerts/alert_123/resolve","host":["{{base_url}}"],"path":["api","v1","alerts","alert_123","resolve"]},
+            "description": "Resolve alert with notes. Status defaults to resolved unless overridden."
+          },
+          "response": [
+            {"name": "200 OK", "code": 200, "body": "{ \"id\": \"alert_123\", \"status\": \"resolved\" }"},
+            {"name": "404 Not Found", "code": 404, "body": "{ \"error\": \"Alert not found\" }"}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "description": "Transaction querying endpoints.",
+      "item": [
+        {
+          "name": "List Transactions",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/v1/transactions?limit=10&customer_id=cust_789&status=COMPLETED","host":["{{base_url}}"],"path":["api","v1","transactions"],"query":[
+              {"key":"limit","value":"10","description":"Max transactions (default 10)"},
+              {"key":"customer_id","value":"cust_789","description":"Filter by customer"},
+              {"key":"card_id","value":"","description":"Filter by card"},
+              {"key":"status","value":"COMPLETED","description":"Filter by status"},
+              {"key":"start_date","value":"","description":"Filter transactions after date"},
+              {"key":"end_date","value":"","description":"Filter transactions before date"},
+              {"key":"cursor","value":"","description":"Pagination cursor"}
+            ]},
+            "description": "Returns paginated transactions with filtering options."
+          },
+          "response": [
+            {"name":"200 OK","code":200,"body":"{ \"data\": [ { \"id\": \"tx_1\", \"amount\": 125.50 } ], \"pagination\": { \"next_cursor\": null, \"has_next\": false } }"},
+            {"name":"500 Server Error","code":500,"body":"{ \"error\": \"Failed to fetch transactions\" }"}
+          ]
+        },
+        {
+          "name": "Get Transaction",
+          "request": {"method":"GET","url":{"raw":"{{base_url}}/api/v1/transactions/tx_1","host":["{{base_url}}"],"path":["api","v1","transactions","tx_1"]},"description":"Retrieve transaction by id."},
+          "response": [
+            {"name":"200 OK","code":200,"body":"{ \"id\": \"tx_1\", \"amount\": 125.50 }"},
+            {"name":"404 Not Found","code":404,"body":"{ \"error\": \"Transaction not found\" }"}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Customers",
+      "description": "Customer profile and listing endpoints.",
+      "item": [
+        {
+          "name": "Get Customer",
+          "request": {"method":"GET","url":{"raw":"{{base_url}}/api/v1/customers/cust_789","host":["{{base_url}}"],"path":["api","v1","customers","cust_789"]},"description":"Fetch single customer profile."},
+          "response": [
+            {"name":"200 OK","code":200,"body":"{ \"success\": true, \"customer\": { \"customer_id\": \"cust_789\" } }"},
+            {"name":"404 Not Found","code":404,"body":"{ \"error\": \"Customer not found\" }"},
+            {"name":"500 Server Error","code":500,"body":"{ \"error\": \"Failed to fetch customer data\" }"}
+          ]
+        },
+        {
+          "name": "Update Customer",
+          "request": {"method":"PUT","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{ \n  \"preferences\": { \"contact\": \"email\" } \n}"},"url":{"raw":"{{base_url}}/api/v1/customers/cust_789","host":["{{base_url}}"],"path":["api","v1","customers","cust_789"]},"description":"Update customer record. Entire data blob replaced."},
+          "response": [
+            {"name":"200 OK","code":200,"body":"{ \"success\": true, \"customer\": { \"customer_id\": \"cust_789\" } }"},
+            {"name":"404 Not Found","code":404,"body":"{ \"error\": \"Customer not found\" }"}
+          ]
+        },
+        {
+          "name": "Delete Customer",
+          "request": {"method":"DELETE","url":{"raw":"{{base_url}}/api/v1/customers/cust_789","host":["{{base_url}}"],"path":["api","v1","customers","cust_789"]},"description":"Deletes customer data record."},
+          "response": [
+            {"name":"200 OK","code":200,"body":"{ \"success\": true, \"message\": \"Customer deleted successfully\" }"},
+            {"name":"404 Not Found","code":404,"body":"{ \"error\": \"Customer not found\" }"}
+          ]
+        },
+        {
+          "name": "List Customers",
+          "request": {"method":"GET","url":{"raw":"{{base_url}}/api/v1/customers?page=1&limit=20","host":["{{base_url}}"],"path":["api","v1","customers"],"query":[{"key":"page","value":"1"},{"key":"limit","value":"20"}]},"description":"Page+limit style pagination."},
+          "response": [
+            {"name":"200 OK","code":200,"body":"{ \"success\": true, \"customers\": [ { \"customer_id\": \"cust_789\" } ], \"pagination\": { \"page\":1, \"limit\":20, \"total\": 57, \"totalPages\":3 } }"}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ingest",
+      "description": "Data ingestion endpoints for customer records.",
+      "item": [
+        {
+          "name": "Ingest Customer Data",
+          "request": {"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{ \n  \"customerData\": { \n    \"customerId\": \"cust_789\", \n    \"profile\": { \"segment\": \"VIP\" } \n  } \n}"},"url":{"raw":"{{base_url}}/api/v1/ingest/data","host":["{{base_url}}"],"path":["api","v1","ingest","data"]},"description":"Creates or updates customer data blob."},
+          "response": [
+            {"name":"200 OK","code":200,"body":"{ \"success\": true, \"customerId\": \"cust_789\" }"},
+            {"name":"400 Bad Request","code":400,"body":"{ \"error\": \"Missing required field: customerId\" }"}
+          ]
+        },
+        {
+          "name": "Batch Ingest",
+          "request": {"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{ \n  \"records\": [ \n    { \"customerId\": \"cust_1\", \"profile\": { \"tier\": \"gold\" } },\n    { \"customerId\": \"cust_2\", \"profile\": { \"tier\": \"silver\" } } \n  ] \n}"},"url":{"raw":"{{base_url}}/api/v1/ingest/batch","host":["{{base_url}}"],"path":["api","v1","ingest","batch"]},"description":"Bulk ingest multiple customers."},
+          "response": [
+            {"name":"200 OK","code":200,"body":"{ \"success\": true, \"processed\": 2, \"succeeded\": 2, \"failed\": 0 }"},
+            {"name":"400 Bad Request","code":400,"body":"{ \"error\": \"Invalid batch data: records array required\" }"}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Insights",
+      "description": "Analytical insight endpoints.",
+      "item": [
+        {
+          "name": "Customer Insights",
+          "request": {"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{ \n  \"customerId\": \"cust_789\", \n  \"limit\": 25 \n}"},"url":{"raw":"{{base_url}}/api/v1/insights/customer","host":["{{base_url}}"],"path":["api","v1","insights","customer"]},"description":"Generates insight bundle for customer interactions."},
+          "response": [
+            {"name":"200 OK","code":200,"body":"{ \"success\": true, \"insights\": { \"interactionSummary\": { \"totalInteractions\": 42 } } }"},
+            {"name":"400 Bad Request","code":400,"body":"{ \"error\": \"Customer ID is required\" }"},
+            {"name":"404 Not Found","code":404,"body":"{ \"error\": \"Customer not found\" }"}
+          ]
+        },
+        {
+          "name": "Trend Analysis",
+          "request": {"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{ \n  \"timeRange\": { \"start\": \"2025-10-01T00:00:00Z\", \"end\": \"2025-11-01T00:00:00Z\" } \n}"},"url":{"raw":"{{base_url}}/api/v1/insights/trends","host":["{{base_url}}"],"path":["api","v1","insights","trends"]},"description":"Returns aggregated trend metrics."},
+          "response": [
+            {"name":"200 OK","code":200,"body":"{ \"success\": true, \"trends\": { \"summary\": { \"totalInteractions\": 523 } } }"}
+          ]
+        },
+        {
+          "name": "Predictive Insights",
+          "request": {"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{ \n  \"customerId\": \"cust_789\", \n  \"predictionType\": \"churn\" \n}"},"url":{"raw":"{{base_url}}/api/v1/insights/predict","host":["{{base_url}}"],"path":["api","v1","insights","predict"]},"description":"Generates predictive metrics (risk scores, probabilities)."},
+          "response": [
+            {"name":"200 OK","code":200,"body":"{ \"success\": true, \"predictions\": { \"churnRisk\": 0.12 } }"},
+            {"name":"400 Bad Request","code":400,"body":"{ \"error\": \"Customer ID is required\" }"},
+            {"name":"404 Not Found","code":404,"body":"{ \"error\": \"No interaction history found for customer\" }"}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Evaluations",
+      "description": "Model evaluation management endpoints.",
+      "item": [
+        {"name":"List Evaluations","request":{"method":"GET","url":{"raw":"{{base_url}}/api/v1/evaluations?limit=10&status=completed","host":["{{base_url}}"],"path":["api","v1","evaluations"],"query":[{"key":"page","value":"1"},{"key":"limit","value":"10"},{"key":"status","value":"completed"},{"key":"sort","value":"updatedAt"},{"key":"order","value":"desc"}]},"description":"Paginated evaluations with filtering and summary stats."},"response":[{"name":"200 OK","code":200,"body":"{ \"evaluations\": [ { \"id\": 1, \"name\": \"Fraud Detection Accuracy\" } ], \"pagination\": { \"page\":1, \"limit\":10 }, \"summary\": { \"totalEvaluations\":6, \"averageScore\":92.3, \"activeTests\":1 } }"}]},
+        {"name":"Get Evaluation","request":{"method":"GET","url":{"raw":"{{base_url}}/api/v1/evaluations/1","host":["{{base_url}}"],"path":["api","v1","evaluations","1"]},"description":"Retrieve evaluation by ID."},"response":[{"name":"200 OK","code":200,"body":"{ \"id\":1, \"name\": \"Fraud Detection Accuracy\" }"},{"name":"404 Not Found","code":404,"body":"{ \"error\": \"Evaluation not found\" }"}]},
+        {"name":"Run Evaluation","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{}"},"url":{"raw":"{{base_url}}/api/v1/evaluations/1/run","host":["{{base_url}}"],"path":["api","v1","evaluations","1","run"]},"description":"Triggers evaluation run; sets status to running."},"response":[{"name":"200 OK","code":200,"body":"{ \"message\": \"Evaluation run started successfully\", \"evaluation\": { \"id\":1, \"status\": \"running\" } }"},{"name":"404 Not Found","code":404,"body":"{ \"error\": \"Evaluation not found\" }"}]}
+      ]
+    },
+    {
+      "name": "Actions",
+      "description": "Operational action endpoints (card freeze, dispute, contact).",
+      "item": [
+        {"name":"Freeze Card","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{ \n  \"cardId\": \"card_123\", \n  \"customerId\": \"cust_789\", \n  \"reason\": \"Potential Fraud\" \n}"},"url":{"raw":"{{base_url}}/api/v1/actions/freeze-card","host":["{{base_url}}"],"path":["api","v1","actions","freeze-card"]},"description":"Freezes customer card. 404 if card not found."},"response":[{"name":"200 OK","code":200,"body":"{ \"success\": true, \"card\": { \"id\": \"card_123\", \"status\": \"FROZEN\" } }"},{"name":"404 Not Found","code":404,"body":"{ \"error\": \"Card not found\" }"},{"name":"400 Bad Request","code":400,"body":"{ \"error\": \"Card ID is required\" }"}]},
+        {"name":"Open Dispute","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{ \n  \"transactionId\": \"tx_1\", \n  \"customerId\": \"cust_789\", \n  \"reasonCode\": \"FRAUD\", \n  \"description\": \"Customer reports unauthorized charge\" \n}"},"url":{"raw":"{{base_url}}/api/v1/actions/open-dispute","host":["{{base_url}}"],"path":["api","v1","actions","open-dispute"]},"description":"Opens a dispute case for a transaction."},"response":[{"name":"200 OK","code":200,"body":"{ \"success\": true, \"case\": { \"id\": \"case_123\" } }"},{"name":"400 Bad Request","code":400,"body":"{ \"error\": \"Transaction ID and reason code are required\" }"}]}
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "description": "Aggregated metrics endpoint.",
+      "item": [
+        {"name":"Dashboard Metrics","request":{"method":"GET","url":{"raw":"{{base_url}}/api/v1/dashboard/metrics","host":["{{base_url}}"],"path":["api","v1","dashboard","metrics"]},"description":"Returns aggregated KPI metrics for dashboard."},"response":[{"name":"200 OK","code":200,"body":"{ \"alertsLast24h\": 15, \"newCustomers\": 7 }"},{"name":"500 Server Error","code":500,"body":"{ \"error\": \"Failed to fetch metrics\" }"}]}
+      ]
+    }
+  ],
+  "event": [],
+  "variable": [
+    {"key": "base_url", "value": "http://localhost:3002"},
+    {"key": "uuid", "value": "{{$guid}}"},
+    {"key": "api_key", "value": "YOUR_API_KEY"}
+  ]
+}

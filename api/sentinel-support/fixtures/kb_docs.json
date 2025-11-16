@@ -1,0 +1,42 @@
+[
+  {
+    "id": "kb-001",
+    "title": "Dispute Process Overview",
+    "anchor": "dispute-overview",
+    "contentText": "When a customer reports an unrecognized transaction, follow these steps: 1. Verify customer identity 2. Check transaction details 3. Contact merchant if necessary 4. File dispute with appropriate reason code 5. Monitor case status. Common reason codes include 10.4 for unrecognized transactions and 13.1 for cancelled services.",
+    "category": "disputes",
+    "tags": ["dispute", "process", "reason-codes"]
+  },
+  {
+    "id": "kb-002",
+    "title": "Card Freeze Procedures",
+    "anchor": "card-freeze",
+    "contentText": "To freeze a customer card: 1. Verify customer identity with OTP 2. Log the freeze reason 3. Send notification to customer 4. Update card status in system. Emergency freezes can bypass OTP for high-risk transactions. Always document the freeze reason and follow up with customer within 24 hours.",
+    "category": "cards",
+    "tags": ["freeze", "security", "procedures"]
+  },
+  {
+    "id": "kb-003", 
+    "title": "Duplicate Transaction Handling",
+    "anchor": "duplicate-transactions",
+    "contentText": "When customers report duplicate charges: 1. Check if transactions are pre-authorization vs capture 2. Verify merchant processing practices 3. Contact merchant for clarification 4. Only dispute if confirmed duplicate. Many 'duplicate' charges are actually pre-auth holds that will drop off automatically.",
+    "category": "transactions",
+    "tags": ["duplicate", "preauth", "merchant"]
+  },
+  {
+    "id": "kb-004",
+    "title": "Risk Assessment Guidelines", 
+    "anchor": "risk-assessment",
+    "contentText": "Risk scoring factors: Transaction velocity (>5 txns/hour = +20 points), New merchant (+15 points), Foreign country (+10 points), Large amount (>$500 = +25 points), New device (+30 points). Scores: 0-30 LOW, 31-70 MEDIUM, 71-90 HIGH, 91-100 CRITICAL. Always consider customer behavior patterns and travel notifications.",
+    "category": "risk",
+    "tags": ["scoring", "risk", "guidelines"]
+  },
+  {
+    "id": "kb-005",
+    "title": "OTP Requirements Policy",
+    "anchor": "otp-policy", 
+    "contentText": "OTP verification required for: Card freeze/unfreeze, Account changes, High-value disputes (>$1000), Sensitive information changes. Standard OTP: 6 digits, 5-minute expiry. Emergency bypass available for critical security events with supervisor approval and full audit trail.",
+    "category": "security",
+    "tags": ["otp", "verification", "policy"]
+  }
+]

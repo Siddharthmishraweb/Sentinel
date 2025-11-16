@@ -1,0 +1,41 @@
+{
+  "name": "sentinel-support",
+  "version": "1.0.0",
+  "description": "Full-Stack Fintech Case Resolution with Multi-Agent Automation",
+  "private": true,
+  "workspaces": [
+    "web",
+    "api"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=api\" \"npm run dev --workspace=web\"",
+    "build": "npm run build --workspace=api && npm run build --workspace=web",
+    "start": "npm run start --workspace=api",
+    "test": "npm run test --workspaces",
+    "eval": "node scripts/run-evals.js",
+    "setup": "docker-compose up -d postgres redis && sleep 5 && npm run migrate && npm run seed",
+    "migrate": "npm run migrate --workspace=api",
+    "seed": "npm run seed --workspace=api",
+    "docker:up": "docker-compose up",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "fintech",
+    "case-resolution",
+    "multi-agent",
+    "typescript",
+    "react",
+    "express",
+    "postgresql",
+    "redis"
+  ],
+  "author": "Sentinel Support Team",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.13.2"
+  }
+}

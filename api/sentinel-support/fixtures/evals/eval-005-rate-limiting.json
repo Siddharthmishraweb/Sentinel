@@ -1,0 +1,31 @@
+{
+  "id": "eval-005",
+  "name": "Rate Limit Enforcement",
+  "description": "Test API rate limiting and 429 response behavior",
+  "scenario": "rate_limiting", 
+  "input": {
+    "clientId": "test-client-001",
+    "requestsPerSecond": 10,
+    "duration": 3,
+    "endpoint": "/api/triage",
+    "payload": {
+      "alertId": "alert-001"
+    }
+  },
+  "expectedOutcome": {
+    "successfulRequests": 15,
+    "rateLimitedRequests": 15,
+    "responseStatus": 429,
+    "headers": {
+      "retryAfter": "number",
+      "xRateLimitRemaining": "0"
+    },
+    "subsequentSuccess": true
+  },
+  "validation": {
+    "retryAfterHeaderPresent": true,
+    "noDuplicateTriageRuns": true,
+    "metricsIncremented": ["rate_limit_block_total"],
+    "nextRequestSucceeds": true
+  }
+}

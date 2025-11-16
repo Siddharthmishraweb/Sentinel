@@ -1,0 +1,47 @@
+{
+  "id": "eval-003",
+  "name": "Duplicate Transaction Analysis", 
+  "description": "Test handling of reported duplicate charges",
+  "scenario": "duplicate_analysis",
+  "input": {
+    "customerId": "d2f8f9b1-5c4g-5d9c-b2f3-g5e6f7890123",
+    "customerReport": "Charged twice at QuickCab",
+    "transactions": [
+      {
+        "id": "txn-suspicious-002",
+        "merchant": "QuickCab", 
+        "amount": 2500,
+        "status": "COMPLETED",
+        "timestamp": "2024-11-14T21:00:00Z",
+        "authCode": "AUTH02"
+      },
+      {
+        "id": "txn-duplicate-001",
+        "merchant": "QuickCab",
+        "amount": 2500, 
+        "status": "PENDING",
+        "timestamp": "2024-11-14T21:00:30Z",
+        "authCode": "AUTH03"
+      }
+    ]
+  },
+  "expectedOutcome": {
+    "analysis": "preauth_vs_capture",
+    "recommendation": "No dispute needed - pending charge will drop automatically",
+    "riskLevel": "LOW",
+    "explanation": "Second transaction appears to be a pre-authorization hold that will release within 3-5 business days",
+    "customerAdvice": "Monitor account - pending charge should disappear automatically",
+    "kbCitations": [
+      {
+        "docId": "kb-003",
+        "title": "Duplicate Transaction Handling", 
+        "anchor": "duplicate-transactions"
+      }
+    ]
+  },
+  "validation": {
+    "noDisputeCreated": true,
+    "customerEducated": true,
+    "followUpScheduled": true
+  }
+}

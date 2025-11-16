@@ -1,0 +1,273 @@
+# Sentinel Support API Collection
+
+## Authentication
+All API requests require the X-API-Key header.
+
+### Variables
+```
+@baseUrl = http://localhost:3001/api
+@apiKey = sentinel-api-key-2024
+```
+
+## Health and System
+
+### Health Check
+GET {{baseUrl}}/health
+
+### Metrics (Prometheus)
+GET {{baseUrl}}/metrics
+
+---
+
+## Transaction Management
+
+### Ingest Transactions
+POST {{baseUrl}}/ingest/transactions
+X-API-Key: {{apiKey}}
+Idempotency-Key: ingest-{{$randomUUID}}
+Content-Type: application/json
+
+{
+  "transactions": [
+    {
+      "customerId": "c1e7e8a0-4b3f-4c8b-a1e2-f4d5e6789012",
+      "cardId": "card-001",
+      "mcc": "5411",
+      "merchant": "Whole Foods",
+      "amountCents": 12499,
+      "currency": "USD",
+      "ts": "{{$datetime}}",
+      "deviceId": "device-001",
+      "country": "US",
+      "city": "San Francisco"
+    }
+  ]
+}
+
+---
+
+## Customer Data
+
+### Get Customer Transactions
+GET {{baseUrl}}/customer/c1e7e8a0-4b3f-4c8b-a1e2-f4d5e6789012/transactions?limit=50
+X-API-Key: {{apiKey}}
+
+### Get Customer Transactions with Date Range
+GET {{baseUrl}}/customer/c1e7e8a0-4b3f-4c8b-a1e2-f4d5e6789012/transactions?from=2024-01-01&to=2024-12-31&limit=100
+X-API-Key: {{apiKey}}
+
+### Get Customer Transactions with Cursor Pagination
+GET {{baseUrl}}/customer/c1e7e8a0-4b3f-4c8b-a1e2-f4d5e6789012/transactions?cursor=eyJ0cyI6IjIwMjQtMTEtMTVUMDQ6MDA6MDBaIn0=&limit=25
+X-API-Key: {{apiKey}}
+
+---
+
+## Customer Insights
+
+### Get Customer Summary
+GET {{baseUrl}}/insights/c1e7e8a0-4b3f-4c8b-a1e2-f4d5e6789012/summary
+X-API-Key: {{apiKey}}
+
+---
+
+## Triage System
+
+### Start Triage Run
+POST {{baseUrl}}/triage
+X-API-Key: {{apiKey}}
+Idempotency-Key: triage-{{$randomUUID}}
+Content-Type: application/json
+
+{
+  "alertId": "alert-001",
+  "options": {
+    "enableLLM": false,
+    "timeoutMs": 5000
+  }
+}
+
+### Get Triage Run Status  
+GET {{baseUrl}}/triage/{{triageRunId}}
+X-API-Key: {{apiKey}}
+
+### Stream Triage Events (SSE)
+# Open in browser or use curl:
+# curl -H "X-API-Key: sentinel-api-key-2024" -H "Accept: text/event-stream" http://localhost:3001/api/triage/{{triageRunId}}/stream
+
+---
+
+## Actions
+
+### Freeze Card
+POST {{baseUrl}}/action/freeze-card
+X-API-Key: {{apiKey}}
+Idempotency-Key: freeze-{{$randomUUID}}
+Content-Type: application/json
+
+{
+  "cardId": "card-004",
+  "reason": "Suspicious activity detected"
+}
+
+### Freeze Card with OTP
+POST {{baseUrl}}/action/freeze-card
+X-API-Key: {{apiKey}}
+Idempotency-Key: freeze-otp-{{$randomUUID}}
+Content-Type: application/json
+
+{
+  "cardId": "card-004",
+  "otp": "123456",
+  "reason": "High-risk transaction"
+}
+
+### Open Dispute
+POST {{baseUrl}}/action/open-dispute
+X-API-Key: {{apiKey}}
+Idempotency-Key: dispute-{{$randomUUID}}
+Content-Type: application/json
+
+{
+  "txnId": "txn-suspicious-001",
+  "reasonCode": "10.4",
+  "confirm": true,
+  "description": "Customer reports unrecognized transaction at ABC Mart"
+}
+
+---
+
+## Knowledge Base
+
+### Search Knowledge Base
+GET {{baseUrl}}/kb/search?q=freeze card procedure&limit=5
+X-API-Key: {{apiKey}}
+
+### Search by Category
+GET {{baseUrl}}/kb/search?q=dispute&category=disputes&limit=10
+X-API-Key: {{apiKey}}
+
+---
+
+## Error Scenarios
+
+### Rate Limit Test (send rapidly)
+POST {{baseUrl}}/triage
+X-API-Key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "alertId": "alert-001"
+}
+
+### Invalid API Key
+POST {{baseUrl}}/triage
+X-API-Key: invalid-key
+Content-Type: application/json
+
+{
+  "alertId": "alert-001"
+}
+
+### Missing Idempotency Key (mutations should still work)
+POST {{baseUrl}}/ingest/transactions
+X-API-Key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "transactions": []
+}
+
+---
+
+## Evaluation Test Cases
+
+### Test Freeze with OTP Flow
+POST {{baseUrl}}/triage
+X-API-Key: {{apiKey}}
+Idempotency-Key: eval-freeze-otp
+Content-Type: application/json
+
+{
+  "alertId": "alert-001"
+}
+
+### Test Duplicate Transaction Analysis  
+POST {{baseUrl}}/triage
+X-API-Key: {{apiKey}}
+Idempotency-Key: eval-duplicate
+Content-Type: application/json
+
+{
+  "alertId": "alert-002"
+}
+
+### Test PII Redaction
+POST {{baseUrl}}/ingest/transactions
+X-API-Key: {{apiKey}}
+Idempotency-Key: eval-pii
+Content-Type: application/json
+
+{
+  "transactions": [
+    {
+      "customerId": "c1e7e8a0-4b3f-4c8b-a1e2-f4d5e6789012",
+      "cardId": "card-001", 
+      "mcc": "5999",
+      "merchant": "Test card 4111111111111111 charge",
+      "amountCents": 5000,
+      "currency": "USD",
+      "ts": "{{$datetime}}"
+    }
+  ]
+}
+
+---
+
+## WebSocket/SSE Testing
+
+### SSE Connection Test (use in browser console)
+```javascript
+const eventSource = new EventSource('/api/triage/run-id-123/stream', {
+  headers: {
+    'X-API-Key': 'sentinel-api-key-2024'
+  }
+});
+
+eventSource.onmessage = function(event) {
+  console.log('Received:', JSON.parse(event.data));
+};
+
+eventSource.onerror = function(error) {
+  console.error('SSE error:', error);
+};
+```
+
+---
+
+## Performance Testing
+
+### Load Test Customer Queries (1M+ transactions)
+GET {{baseUrl}}/customer/c1e7e8a0-4b3f-4c8b-a1e2-f4d5e6789012/transactions?from=2024-01-01&to=2024-12-31&limit=1000
+X-API-Key: {{apiKey}}
+
+### Measure Query Performance  
+GET {{baseUrl}}/customer/c1e7e8a0-4b3f-4c8b-a1e2-f4d5e6789012/transactions?last=90d&explain=true
+X-API-Key: {{apiKey}}
+
+---
+
+## Monitoring and Observability
+
+### Application Logs
+# Check logs in Docker:
+# docker-compose logs -f api
+
+### Database Performance
+# Connect to PostgreSQL:
+# docker-compose exec postgres psql -U sentinel -d sentinel_db
+# EXPLAIN ANALYZE SELECT * FROM transactions WHERE customer_id = 'uuid' ORDER BY ts DESC LIMIT 50;
+
+### Redis Monitoring
+# Connect to Redis:
+# docker-compose exec redis redis-cli
+# MONITOR  # Shows real-time commands
